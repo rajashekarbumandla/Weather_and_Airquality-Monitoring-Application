@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            width: 80%;
+            margin: 40px auto;
+            max-width: 1000px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 12px;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .back-button, .leaderboard-button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            text-align: center;
+            display: inline-block;
+            margin-top: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .back-button:hover, .leaderboard-button:hover {
+            background-color: #45a049;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Carbon Footprint Leaderboard</h1>
+
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>User Name</th> 
+                    <th>City</th>
+                    <th>Total Carbon Footprint (kg CO2)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in leaderboard %}
+                    <tr>
+                        <td>{{ user.rank }}</td>
+                        <td>{{ user.name }}</td>  
+                        <td>{{ user.city }}</td>
+                        <td>{{ user.total_footprint }} kg</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Button to go back to the Carbon Tracker page -->
+        <a href="{{ url_for('carbon_tracker') }}" class="back-button">Back to Carbon Tracker</a>
+    </div>
+
+</body>
+</html>

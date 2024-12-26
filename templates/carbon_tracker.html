@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Tracker</title>
+    <style>
+        /* General body styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header styling */
+        h1 {
+            text-align: center;
+            color: #fff;
+            background-color: #4CAF50;
+            padding: 30px 0;
+            margin: 0;
+            font-size: 36px;
+            font-weight: 700;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Back to Home button styling */
+        .home-button {
+            display: block;
+            width: 220px;
+            margin: 30px auto 20px;
+            padding: 16px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .home-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Main container for content */
+        .container {
+            width: 85%;
+            margin: 40px auto;
+            max-width: 1200px;
+        }
+
+        /* Form styling */
+        form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        form label {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4CAF50;
+        }
+
+        /* Input fields */
+        form input[type="number"], form input[type="text"], form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        form input[type="number"]:focus, form input[type="text"]:focus, form select:focus {
+            border-color: #4CAF50;
+            background-color: #e8f5e9;
+            outline: none;
+        }
+
+        form input[type="number"]:hover, form input[type="text"]:hover, form select:hover {
+            border-color: #4CAF50;
+            background-color: #f1f8f4;
+        }
+
+        /* Submit Button Styling - Increased size and color */
+        form button {
+            padding: 20px; /* Increased padding for a larger button */
+            background-color: #FF5733; /* Vibrant red-orange background */
+            color: white;
+            font-size: 22px; /* Larger font size */
+            border: none;
+            border-radius: 8px; /* Slightly more rounded corners */
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            width: 100%; /* Full width */
+            margin-top: 15px;
+        }
+
+        form button:hover {
+            background-color: #e64a2d; /* Slightly darker shade for hover effect */
+            transform: scale(1.05);
+        }
+
+        /* Styling for results and graphs */
+        h2 {
+            text-align: center;
+            color: #4CAF50;
+            margin-top: 40px;
+            font-size: 28px;
+        }
+
+        h3 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-top: 40px;
+        }
+
+        /* Displaying carbon footprint result */
+        .result {
+            background-color: #e8f5e9;
+            border: 1px solid #4CAF50;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #388e3c;
+        }
+
+        /* Graph styling */
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        /* List of previous entries */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+
+        li {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        li:hover {
+            transform: scale(1.02);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* Leaderboard Button styling */
+        .leaderboard-button {
+            width: 100%;
+            padding: 16px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-top: 20px;
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .leaderboard-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .home-button, .leaderboard-button {
+                width: 100%;
+                margin: 10px 0;
+            }
+
+            h2, h3 {
+                font-size: 24px;
+            }
+
+            form {
+                padding: 20px;
+            }
+
+            form button {
+                padding: 18px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Carbon Tracker</h1>
+
+    <!-- Back to Home Button -->
+    <a href="{{ url_for('home') }}" class="home-button">Back to Home</a>
+
+    <div class="container">
+        <!-- Carbon Footprint Form -->
+        <form method="POST">
+            {{ form.hidden_tag() }}  <!-- CSRF Token -->
+
+            <div>
+                {{ form.transport.label }} <br>
+                {{ form.transport() }} 
+            </div>
+
+            <div>
+                {{ form.electricity.label }} <br>
+                {{ form.electricity() }}
+            </div>
+
+            <div>
+                {{ form.waste.label }} <br>
+                {{ form.waste() }}
+            </div>
+
+            <div>
+                {{ form.submit() }}
+            </div>
+        </form>
+
+        <!-- Display the Carbon Footprint Result if available -->
+        {% if carbon_footprint_result %}
+            <div class="result">
+                <p>Total Carbon Footprint: {{ carbon_footprint_result }} kg CO2</p>
+            </div>
+        {% endif %}
+
+        <!-- Display the Updated Carbon Footprint Graph -->
+        <h2>Your Carbon Footprint Over Time</h2>
+        <img src="data:image/png;base64,{{ plot_data }}" alt="Carbon Footprint Chart">
+
+        <!-- Display Latest 10 Previous Entries -->
+        <h3>Latest 10 Entries:</h3>
+        <ul>
+            {% for entry in entries[:10] %}
+                <li>{{ entry.date.strftime('%Y-%m-%d') }} - Transport: {{ entry.transport }} km, Electricity: {{ entry.electricity }} kWh, Waste: {{ entry.waste }} kg, Total: {{ entry.total }} kg CO2</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Button to go to Leaderboard Page -->
+    <a href="{{ url_for('leaderboard') }}" class="leaderboard-button">View Leaderboard</a>
+
+    <footer>
+        <p>&copy; 2024 Carbon Tracker. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>

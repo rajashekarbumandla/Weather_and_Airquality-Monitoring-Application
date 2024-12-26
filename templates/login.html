@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+            background-image: url('https://images.unsplash.com/photo-1630260643564-7f9c9c140682?q=80&w=1770&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); 
+        }
+        .form-container {
+            background: #fff;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #0073e6;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #005bb5;
+        }
+        p {
+            margin-top: 15px;
+        }
+        a {
+            color: #0073e6;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Error message styling */
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Login</h2>
+        <form id="loginForm" method="POST" onsubmit="return validateForm()">
+            <label for="email">EMAIL</label>
+            <input type="email" id="email" name="email">
+            <p id="emailError" class="error">Please enter your email</p>
+
+            <label for="password">PASSWORD</label>
+            <input type="password" id="password" name="password">
+            <p id="passwordError" class="error">Please enter your password</p>
+
+            <button type="submit">Login</button><br>
+            <p>Need an account? <a href="{{ url_for('register') }}">Register</a></p>
+        </form>
+    </div>
+
+    <script>
+        function validateForm() {
+            // Reset previous error messages
+            document.getElementById('emailError').style.display = 'none';
+            document.getElementById('passwordError').style.display = 'none';
+
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            var valid = true;
+
+            // Check if email is empty
+            if (email.trim() === '') {
+                document.getElementById('emailError').style.display = 'block';
+                valid = false;
+            }
+
+            // Check if password is empty
+            if (password.trim() === '') {
+                document.getElementById('passwordError').style.display = 'block';
+                valid = false;
+            }
+
+            return valid;
+        }
+    </script>
+</body>
+</html>

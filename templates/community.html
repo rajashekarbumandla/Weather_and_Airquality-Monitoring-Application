@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Dashboard</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-button {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            background-color: #45a049;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            background-color: #398a3b;
+            transform: scale(1.05);
+        }
+
+        .community-section {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .community-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            transition: transform 0.2s ease;
+        }
+
+        .community-card:hover {
+            transform: translateY(-5px);
+        }
+
+        h3 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 0.25rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            border-color: #4CAF50;
+            background-color: #fff;
+            outline: none;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #398a3b;
+            transform: scale(1.05);
+        }
+
+        .community-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .community-item {
+            border-bottom: 1px solid #ddd;
+            padding: 1rem 0;
+        }
+
+        .community-item:last-child {
+            border-bottom: none;
+        }
+
+        .likes-comments {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .likes-comments span {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .like-button, .comment-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .like-button:hover, .comment-button:hover {
+            background-color: #398a3b;
+            transform: scale(1.1);
+        }
+
+        ul {
+            padding-left: 1rem;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        textarea {
+            margin-top: 0.5rem;
+            resize: vertical;
+            min-height: 100px;
+            font-size: 1rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        footer a {
+            color: #d4d4d4;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Community Dashboard</h1>
+        <nav>
+            <a href="{{ url_for('home') }}" class="nav-button">Home</a>
+            <a href="{{ url_for('carbon_tracker') }}" class="nav-button">Carbon Tracker</a>
+        </nav>
+    </header>
+
+    <div class="community-section">
+        <!-- Add a Post -->
+        <div class="community-card">
+            <h3>Add a Post</h3>
+            <form action="/community" method="POST">
+                <div class="form-group">
+                    <label for="post-title">Post Title:</label>
+                    <input type="text" id="post-title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Add Post</button>
+                </div>
+            </form>
+        </div> 
+         
+
+         
+
+        <!-- List of Posts -->
+        <div class="community-card">
+            <h3>Recent Posts</h3>
+            <ul class="community-list">
+                {% for post in posts %}
+                <li class="community-item">
+                    <h4>{{ post.title }}</h4>
+                    <div class="posted-by">Posted by: <strong>{{ post.username }}</strong> at {{ post.created_at }}</div>
+                    <div class="likes-comments">
+                        <form action="/like_post/{{ post.id }}" method="POST" style="display: inline;">
+                            <button type="submit" class="like-button">Like</button>
+                        </form>
+                        <span>{{ post.likes }} Likes</span>
+                    </div> 
+                    
+
+                    <!-- Comments -->
+                    <div>
+                        <h5>Comments:</h5>
+                        <ul>
+                            {% for comment in post.comments %}
+                            <li>
+                                <strong>{{ comment.username }}:</strong> {{ comment.content }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <form action="/add_comment/{{ post.id }}" method="POST">
+                            <textarea name="content" placeholder="Add a comment..." required></textarea>
+                            <button type="submit" class="comment-button">Submit Comment</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 Community Dashboard. All rights reserved.
+        <br>
+        <a href="#top">Back to top</a>
+    </footer>
+</body>
+</html>
