@@ -17,7 +17,7 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users1.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users4.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'secret_key'
 
@@ -27,19 +27,14 @@ admin = Admin(app, name='Admin Panel', template_mode='bootstrap3')
 
 
 # Define your models
+
+# Define models
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     city = db.Column(db.String(100), nullable=True)
-
-    def __init__(self, name, email, password, city):
-        self.name = name
-        self.email = email
-        self.password = password
-        self.city = city
-
 
 class CarbonFootprint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -50,16 +45,22 @@ class CarbonFootprint(db.Model):
     waste = db.Column(db.Float, nullable=False, default=0.0)
     total = db.Column(db.Float, nullable=False, default=0.0)
 
-
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     username = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    likes = db.Column(db.Integer, default=0)
-    comments = db.relationship('Comment', backref='post', lazy=True) 
-    user_likes = db.relationship('Like', backref='liked_post', lazy=True)
+    likes = db.Column(db.Integer, default=0) 
+    
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+
+    def __init__(self, user_id, post_id):
+        self.user_id = user_id
+        self.post_id = post_id
 
 
 class Comment(db.Model):
@@ -67,50 +68,8 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     username = db.Column(db.String(100), nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow) 
-    
-class Like(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
-    
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
-    def __init__(self, user_id, post_id):
-        self.user_id = user_id
-        self.post_id = post_id
-
-
-
-# Admin Panel Setup
-class UserAdmin(ModelView):
-    column_list = ('id', 'name', 'email', 'city')
-    form_columns = ('name', 'email', 'password', 'city')
-    search_fields = ['name', 'email']
-
-
-class CarbonFootprintAdmin(ModelView):
-    column_list = ('id', 'user_id', 'date', 'transport', 'electricity', 'waste', 'total')
-    form_columns = ('user_id', 'date', 'transport', 'electricity', 'waste', 'total')
-    search_fields = ['user_id']
-
-
-class PostAdmin(ModelView):
-    column_list = ('id', 'title', 'username', 'likes', 'created_at')
-    form_columns = ('title', 'content', 'username', 'likes', 'created_at')
-    search_fields = ['title', 'content']
-
-
-class CommentAdmin(ModelView):
-    column_list = ('id', 'content', 'username', 'post_id', 'created_at')
-    form_columns = ('content', 'username', 'post_id', 'created_at')
-    search_fields = ['content', 'username']
-
-
-# Add views to the admin panel
-admin.add_view(UserAdmin(User, db.session))
-admin.add_view(CarbonFootprintAdmin(CarbonFootprint, db.session))
-admin.add_view(PostAdmin(Post, db.session))
-admin.add_view(CommentAdmin(Comment, db.session))
 
 # API Keys (for weather, AQI, etc.)
 openweatherMapApiKey = "7d9d91e8a10b95b8d8f7a2c5656e5bf9"
@@ -167,58 +126,20 @@ def get_aqi_news():
         data = response.json()
         if response.status_code == 200:
             articles = data.get('results', [])
-            return jsonify({'articles': articles[:10]})
+            # Return the articles with image URL, title, and link
+            articles_with_images = [
+                {
+                    'title': article['title'],
+                    'link': article['link'],
+                    'image': article.get('image_url', '')  # Assuming 'image_url' is the key
+                }
+                for article in articles[:10]
+            ]
+            return jsonify({'articles': articles_with_images})
         else:
             return jsonify({'error': 'Failed to retrieve news'}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-@app.route('/', methods=['GET'])
-def index():
-    return render_template('index.html')
-
-
-# Register Route
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
-        confirm_password = request.form['confirmpassword']
-        city = request.form['city']
-        if password != confirm_password:
-            flash("Passwords do not match!")
-            return render_template('register.html')
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
-            flash("User with this email already exists.")
-            return render_template('register.html')
-        new_user = User(name=name, email=email, password=password, city=city)
-        db.session.add(new_user)
-        db.session.commit()
-        flash("Registration successful! Please login.")
-        return redirect(url_for('login'))
-    return render_template('register.html')
-
-
-# Login Route
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        user = User.query.filter_by(email=email, password=password).first()
-        if user:
-            session['logged_in'] = True
-            session['user_id'] = user.id
-            session['username'] = user.name
-            flash("Login successful! Welcome.")
-            return redirect(url_for('home'))
-        flash("Invalid email or password.")
-        return redirect(url_for('login'))
-    return render_template('login.html')
 
 
 # Leaderboard Route
@@ -234,22 +155,6 @@ def leaderboard():
         for idx, (name, city, total_footprint) in enumerate(leaderboard)
     ]
     return render_template('leaderboard.html', leaderboard=leaderboard_with_rank)
-
-
-# Home Route
-@app.route('/home')
-def home():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'), message="Incorrect Details")
-    return render_template('home.html', username=session['username'])
-
-
-# Logout Route
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash("You have logged out successfully.")
-    return redirect(url_for('index'))
 
 
 # Carbon Tracker Route
@@ -320,7 +225,13 @@ def community():
         return redirect(url_for('community'))
 
     posts = Post.query.order_by(Post.created_at.desc()).all()
+
+    # Preload comments for each post
+    for post in posts:
+        post.comments = Comment.query.filter_by(post_id=post.id).all()
+
     return render_template('community.html', posts=posts)
+
 
 @app.route('/like_post/<int:post_id>', methods=['POST'])
 def like_post(post_id):
@@ -359,8 +270,212 @@ def add_comment(post_id):
         new_comment = Comment(content=content, username=username, post_id=post_id)
         db.session.add(new_comment)
         db.session.commit()
-    return redirect(url_for('community'))
+    return redirect(url_for('community')) 
+ 
 
+@app.route('/')
+def index():
+    return render_template('index.html')     
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirmpassword']
+        city = request.form['city']
+        if password != confirm_password:
+            flash("Passwords do not match!")
+            return render_template('register.html')
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            flash("User with this email already exists.")
+            return render_template('register.html')
+        new_user = User(name=name, email=email, password=password, city=city)
+        db.session.add(new_user)
+        db.session.commit()
+        flash("Registration successful! Please login.")
+        return redirect(url_for('login'))
+    return render_template('register.html') 
+
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        user = User.query.filter_by(email=email, password=password).first()
+        if user:
+            session['logged_in'] = True
+            session['user_id'] = user.id
+            session['username'] = user.name
+            session['is_admin'] = (user.email == "pintu@gmail.com")
+            if session['is_admin']:
+                flash("Admin login successful!")
+                return redirect(url_for('admin_dashboard'))
+            flash("Login successful! Welcome.")
+            return redirect(url_for('home'))
+        flash("Invalid email or password.")
+        return redirect(url_for('login'))
+    return render_template('login.html') 
+
+
+
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        if email == 'pintu@gmail.com' and password == '123':
+            session['admin_logged_in'] = True
+            flash("Admin login successful!")
+            return redirect(url_for('admin_dashboard'))  # We change this to redirect to a new page
+        flash("Invalid admin credentials!")
+        return redirect(url_for('admin_login'))
+    return render_template('admin_login.html')
+
+
+
+@app.route('/admin_homepage')
+def admin_homepage():
+    if not session.get('admin_logged_in'):
+        flash("Unauthorized access!")
+        return redirect(url_for('admin_login'))
+    
+    return render_template('admin_homepage.html') 
+
+
+
+@app.route('/admin_dashboard')
+def admin_dashboard():
+    if not session.get('is_admin'):
+        flash("Unauthorized access!")
+        return redirect(url_for('login'))
+
+    # Fetch all the users and posts
+    users = User.query.all()
+    posts = Post.query.all()
+
+    # Join Comment with Post and then with User
+    comments = db.session.query(Comment, Post, User).join(Post, Comment.post_id == Post.id).join(User, Post.username == User.name).all()
+
+    # Join CarbonFootprint with User
+   # Join CarbonFootprint with User
+    carbon_footprints = db.session.query(CarbonFootprint, User).join(User, CarbonFootprint.user_id == User.id).all()
+
+
+    return render_template('admin_dashboard.html', users=users, posts=posts, comments=comments, carbon_footprints=carbon_footprints) 
+
+
+
+@app.route('/home')
+def home():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('home.html', username=session['username']) 
+
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash("You have logged out successfully.")
+    return redirect(url_for('index')) 
+
+
+@app.route('/delete_user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    if not session.get('is_admin'):
+        flash("Unauthorized access!")
+        return redirect(url_for('login'))
+
+    # Fetch the user to delete
+    user = User.query.get(user_id)
+    if not user:
+        flash("User not found!")
+        return redirect(url_for('admin_dashboard'))
+
+    # Check if the user is the admin user with email 'pintu@gmail.com' and password '3734'
+    if user.email == 'pintu@gmail.com' and user.password == '3734':
+        flash("You cannot delete the admin account!")
+        return redirect(url_for('admin_dashboard'))
+
+    # Delete associated data before deleting user
+    CarbonFootprint.query.filter_by(user_id=user.id).delete()
+    Post.query.filter_by(username=user.name).delete()
+    Comment.query.filter_by(username=user.name).delete()
+    Like.query.filter_by(user_id=user.id).delete()
+
+    db.session.delete(user)
+    db.session.commit()
+
+    flash("User and related data deleted successfully!")
+    return redirect(url_for('admin_dashboard')) 
+
+
+
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+def delete_post(post_id):
+    if not session.get('is_admin'):
+        flash("Unauthorized access!")
+        return redirect(url_for('login'))
+
+    post = Post.query.get(post_id)
+    if not post:
+        flash("Post not found!")
+        return redirect(url_for('admin_dashboard'))
+
+    # Delete related comments and likes
+    Comment.query.filter_by(post_id=post.id).delete()
+    Like.query.filter_by(post_id=post.id).delete()
+
+    db.session.delete(post)
+    db.session.commit()
+
+    flash("Post and related data deleted successfully!")
+    return redirect(url_for('admin_dashboard')) 
+
+
+
+@app.route('/delete_comment/<int:comment_id>', methods=['POST'])
+def delete_comment(comment_id):
+    if not session.get('is_admin'):
+        flash("Unauthorized access!")
+        return redirect(url_for('login'))
+
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        flash("Comment not found!")
+        return redirect(url_for('admin_dashboard'))
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    flash("Comment deleted successfully!")
+    return redirect(url_for('admin_dashboard'))
+
+
+
+@app.route('/delete_carbon_footprint/<int:footprint_id>', methods=['POST'])
+def delete_carbon_footprint(footprint_id):
+    if not session.get('is_admin'):
+        flash("Unauthorized access!")
+        return redirect(url_for('login'))
+
+    footprint = CarbonFootprint.query.get(footprint_id)
+    if not footprint:
+        flash("Carbon footprint not found!")
+        return redirect(url_for('admin_dashboard'))
+
+    db.session.delete(footprint)
+    db.session.commit()
+
+    flash("Carbon footprint data deleted successfully!")
+    return redirect(url_for('admin_dashboard'))
 
 if __name__ == '__main__':
     with app.app_context():
