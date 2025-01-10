@@ -6,182 +6,218 @@
     <title>Weather & AQI Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            box-sizing: border-box;
+        /* General body styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
             margin: 0;
             padding: 0;
+            color: #333;
         }
 
-        /* General body styling */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
-    color: #333;
-}
+        /* Header styling */
+        h1 {
+            text-align: center;
+            color: #fff;
+            background-color: #4CAF50;
+            padding: 20px;
+            margin: 0;
+            font-size: 36px;
+        }
 
-/* Header styling */
-h1 {
-    text-align: center;
-    color: #fff;
-    background-color: #4CAF50;
-    padding: 20px;
-    margin: 0;
-    font-size: 36px;
-}
+        /* Navigation Bar */
+        nav {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+        }
 
-/* Navigation Bar */
-nav {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-}
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    margin: 0 auto;
-}
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
 
-.logo {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: white;
-}
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
 
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    transition: color 0.3s;
-}
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #c2f5c6;
+        }
 
-.nav-links a:hover,
-.nav-links a.active {
-    color: #c2f5c6;
-}
+        /* Main container */
+        .container {
+            width: 80%;
+            margin: 40px auto;
+            max-width: 1200px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
-/* Main container */
-.container {
-    width: 80%;
-    margin: 40px auto;
-    max-width: 1200px;
-    background-color: white;
-    border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
+        /* Input Container */
+        .input-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
 
-/* Input Container */
-.input-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 30px;
-}
+        #city-input {
+            width: 70%;
+            max-width: 400px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
 
-#city-input {
-    width: 70%;
-    max-width: 400px;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
+        #search-btn {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-#search-btn {
-    padding: 12px 20px;
-    background-color: #4CAF50;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
+        #search-btn:hover {
+            background-color: #45a049;
+        }
 
-#search-btn:hover {
-    background-color: #45a049;
-}
+        /* Grid layout */
+        .grid {
+            display: grid;
+            grid-template-areas:
+                "weather-details news-feed"
+                "aqi-details news-feed"
+                "aqi-chart news-feed"
+                "temp-bar-chart news-feed";
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
 
-/* Grid layout */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 20px;
-}
+        #weather-details {
+            grid-area: weather-details;
+        }
 
-/* Card styling */
-.card {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
+        #aqi-details {
+            grid-area: aqi-details;
+        }
 
-.card:hover {
-    transform: scale(1.02);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-}
+        #news-feed {
+            grid-area: news-feed;
+        }
 
-.card h2 {
-    font-size: 20px;
-    color: #4CAF50;
-    margin-bottom: 15px;
-}
+        #aqi-chart {
+            grid-area: aqi-chart;
+        }
 
-.card p {
-    margin: 10px 0;
-    line-height: 1.6;
-    color: #555;
-}
+        #temp-bar-chart {
+            grid-area: temp-bar-chart;
+        }
 
-/* Link styling */
-a {
-    color: #4CAF50;
-    text-decoration: none;
-}
+        /* Card styling */
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
 
-a:hover {
-    text-decoration: underline;
-}
+        .card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
 
-/* Chart styling */
-canvas {
-    width: 100%;
-    height: auto;
-}
+        .card h2 {
+            font-size: 20px;
+            color: #4CAF50;
+            margin-bottom: 15px;
+        }
 
-/* Footer */
-footer {
-    text-align: center;
-    margin-top: 50px;
-    padding: 20px;
-    background-color: #4CAF50;
-    color: white;
-    font-size: 14px;
-}
+        .card p {
+            margin: 10px 0;
+            line-height: 1.6;
+            color: #555;
+        }
 
-@media (max-width: 768px) {
-    .container {
-        width: 90%;
-    }
-}
+        /* Link styling */
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
 
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* Chart styling */
+        canvas {
+            width: 100%;
+            height: auto;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 14px;
+        }
+
+        /* Responsive styling */
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+            .grid {
+                grid-template-areas:
+                    "weather-details"
+                    "aqi-details"
+                    "news-feed"
+                    "aqi-chart"
+                    "temp-bar-chart";
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* News Feed Image Styling */
+        #news-feed img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
     </style>
 </head>
-<body> 
+<body>
     <nav>
         <div class="nav-container">
             <h1 class="logo">Weather & AQI Dashboard</h1>
@@ -325,7 +361,10 @@ footer {
 
                 if (newsResponse.ok) {
                     newsInfo.innerHTML = newsData.articles.map(article => `
-                        <p><a href="${article.link}" target="_blank">${article.title}</a></p>
+                        <div>
+                            ${article.image ? `<img src="${article.image}" alt="News Image" style="width: 100%; height: auto; margin-bottom: 10px;">` : ''}
+                            <p><a href="${article.link}" target="_blank">${article.title}</a></p>
+                        </div>
                     `).join('');
                 } else {
                     newsInfo.innerHTML = `<p>${newsData.error}</p>`;
