@@ -329,7 +329,7 @@ def admin_login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        if email == 'pintu@gmail.com' and password == '123':
+        if email == 'pintu@gmail.com' and password == '3734':
             session['admin_logged_in'] = True
             flash("Admin login successful!")
             return redirect(url_for('admin_dashboard'))  # We change this to redirect to a new page
