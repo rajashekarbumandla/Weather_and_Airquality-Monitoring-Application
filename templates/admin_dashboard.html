@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* Reset some default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4CAF50;
+        }
+
+        h2 {
+            margin-top: 20px;
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li button {
+            padding: 8px 15px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        li button:hover {
+            background-color: #c0392b;
+        }
+
+        .btn {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .logout-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #4CAF50;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logout-link:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Admin Dashboard</h1>
+
+        <h2>Users</h2>
+        <ul>
+            {% for user in users %}
+                <li>
+                    <span>{{ user.name }} - {{ user.email }}</span>
+                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete User</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Posts</h2>
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <span>{{ post.title }} - {{ post.username }}</span>
+                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete Post</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Comments</h2>
+        <ul>
+            {% for comment, post, user in comments %}
+                <li>
+                    <span>{{ comment.content }} - {{ post.title }} - {{ user.name }}</span>
+                    <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete Comment</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h2>Carbon Footprints</h2>
+        <ul>
+            {% for footprint, user in carbon_footprints %}
+                <li>
+                    <span>{{ user.name }} - {{ footprint.total }} kg CO2</span>
+                    <form action="{{ url_for('delete_carbon_footprint', footprint_id=footprint.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Delete Carbon Footprint</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+    </div>
+
+</body>
+</html>
